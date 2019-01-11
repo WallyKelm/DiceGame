@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
-
-This is a temporary script file.
+Dice Game
+Define game rules and basic player actions.  Simulate game.
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -152,6 +151,26 @@ class GameBoard():
                     available.append(t)
         return sorted(available)
 
+    def make_player_move(self, selected_option):
+#        print("Before:" + str(self.gb.active_token_height))
+        token = []
+        for opt in selected_option:
+            for i in range(3): # check if active token and add if necessary
+                active = self.active_token_column[i]
+#                print(f"{opt}, {active}")
+                if opt == active: # Already an active token
+                    self.active_token_height[i] +=1
+                    if i not in token:
+                        token.append(i)
+                    break
+                elif active == -1: # add new token.  Must sort desc to keep -1's at end
+                    self.active_token_column[i] = opt
+#                    self.active_token_column = sorted(self.active_token_column, reverse=True)
+                    self.active_token_height[i] = 1 + self.get_player_height(column=opt)
+                    if i not in token:
+                        token.append(i)
+                    break
+        return token
 
 
 ####################################################
@@ -255,20 +274,7 @@ class GameRules():
         return player_choice
 
     def make_player_move(self, selected_option):
-#        print("Before:" + str(self.gb.active_token_height))
-        for opt in selected_option:
-            for i in range(3): # check if active token and add if necessary
-                active = self.gb.active_token_column[i]
-#                print(f"{opt}, {active}")
-                if opt == active: # Already an active token
-                    self.gb.active_token_height[i] +=1
-                    break
-                elif active == -1: # add new token.  Must sort desc to keep -1's at end
-                    self.gb.active_token_column[i] = opt
-                    self.gb.active_token_column = sorted(self.gb.active_token_column, reverse=True)
-                    self.gb.active_token_height[i] = 1 + self.gb.get_player_height(column=opt)
-                    break
-#        print("After:" + str(self.gb.active_token_height))
+        self.gb.make_player_move(selected_option)
         self.check_mid_turn_completed_col()
             
             
